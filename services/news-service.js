@@ -11,16 +11,14 @@ export const fetchLatestNews = async () => {
     
     try {
         const response = await axios.get(url);
+        const articles= response.data.articles;
         
-        if (!response.data.articles || response.data.articles.length === 0) {
-            throw new Error('No articles found in the news API response');
+        if(!articles || articles.length === 0) {
+            throw new Error('No articles found from the news API');
         }
-        
-        const article = response.data.articles[0];
-        
-        if (!article.title && !article.description) {
-            throw new Error('Article has no title or description');
-        }
+
+        const randomIndex = Math.floor(Math.random() * articles.length);
+        const article = articles[randomIndex];
         
         return {
             title: article.title || 'No title available',
