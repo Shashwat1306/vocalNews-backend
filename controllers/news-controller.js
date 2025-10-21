@@ -26,31 +26,42 @@ const voiceMap={
 
 export const convertLatestNewsToAudio = async (req, res) => {
   try {
-    console.log("Starting convertLatestNewsToAudio...");
+    console.log("🔍 Starting convertLatestNewsToAudio...");
+    console.log("📥 Request body:", req.body);
     
-    console.log("Fetching latest news...");
-    const news = await fetchLatestNews();
-    console.log("News fetched:", { title: news.title, hasDescription: !!news.description });
+    const { lang, category } = req.body;
+    console.log("🌍 Selected language:", lang);
+    console.log("📂 Selected category:", category);
+    
+    console.log("📰 Fetching latest news...");
+    const news = await fetchLatestNews(category || 'technology');
+    console.log("✅ News fetched:", { title: news.title, hasDescription: !!news.description, category: news.category });
     
     if (!news || (!news.title && !news.description)) {
       return res.status(404).json({ error: "No news found" });
     }
-    const {lang} = req.body;
-    const voiceId=voiceMap[lang] || voiceMap.en;
+    
+    const voiceId = voiceMap[lang] || voiceMap.en;
+    console.log("🎙️ Voice ID selected:", voiceId);
 
     const text = news.description || news.title;
-    console.log("Generating audio for text length:", text.length, "with voice:", voiceId);
+    console.log("📝 Text to convert (length:", text.length, ")");
     
-    const audioFile = await generateAudio(text, voiceId,true);
-    console.log("Audio generated:", !!audioFile);
+    const audioFile = await generateAudio(text, voiceId);
+    console.log("✅ Audio generated:", !!audioFile);
     
     if (!audioFile) {
       return res.status(500).json({ error: "No audio file returned from Murf" });
     }
     
-    res.json({ news, audioUrl: audioFile , language: lang || "en" });
+    res.json({ 
+      news, 
+      audioUrl: audioFile, 
+      language: lang || "en",
+      category: category || "technology"
+    });
   } catch (error) {
-    console.error("Error in convertLatestNewsToAudio:", error.response?.data || error.message);
+    console.error("❌ Error in convertLatestNewsToAudio:", error.response?.data || error.message);
     res.status(500).json({ 
       error: "Failed to fetch or convert news", 
       details: error.message,
