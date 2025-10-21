@@ -16,6 +16,13 @@ export const convertNewsToAudio = async (req, res) => {
     res.status(500).json({ error: "Failed to convert news to audio" });
   }
 };
+const voiceMap={
+  en : "en-US-natalie",
+  hi : "hi-IN-shweta",
+  es : "es-ES-carmen",
+  fr : "fr-FR-adélie",
+  de : "de-DE-lukas",
+};
 
 export const convertLatestNewsToAudio = async (req, res) => {
   try {
@@ -28,19 +35,20 @@ export const convertLatestNewsToAudio = async (req, res) => {
     if (!news || (!news.title && !news.description)) {
       return res.status(404).json({ error: "No news found" });
     }
-    
+    const {lang} = req.body;
+    const voiceId=voiceMap[lang] || voiceMap.en;
+
     const text = news.description || news.title;
-    const voiceId = req.body?.voiceId || "en-US-natalie";
     console.log("Generating audio for text length:", text.length, "with voice:", voiceId);
     
-    const audioFile = await generateAudio(text, voiceId);
+    const audioFile = await generateAudio(text, voiceId,true);
     console.log("Audio generated:", !!audioFile);
     
     if (!audioFile) {
       return res.status(500).json({ error: "No audio file returned from Murf" });
     }
     
-    res.json({ news, audioUrl: audioFile });
+    res.json({ news, audioUrl: audioFile , language: lang || "en" });
   } catch (error) {
     console.error("Error in convertLatestNewsToAudio:", error.response?.data || error.message);
     res.status(500).json({ 
