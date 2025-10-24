@@ -44,7 +44,7 @@ export const convertLatestNewsToAudio = async (req, res) => {
     const voiceId = voiceMap[lang] || voiceMap.en;
     console.log("🎙️ Voice ID selected:", voiceId);
 
-    const text = news.description || news.title;
+    const text = news.title + " ." + news.description;
     console.log("📝 Text to convert (length:", text.length, ")");
     
     const audioFile = await generateAudio(text, voiceId);

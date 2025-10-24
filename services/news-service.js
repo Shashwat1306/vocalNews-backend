@@ -26,6 +26,7 @@ export const fetchLatestNews = async (category = 'technology') => {
             title: article.title || 'No title available',
             description: article.description || 'No description available',
             content: article.content || 'No content available',
+            url: article.url || 'No URL available',
             category: category,
         };
     } catch (error) {

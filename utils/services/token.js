@@ -5,5 +5,5 @@ export const generateToken=(email)=>{
 }
 export const verifyToken=(token)=>{
     const decode=jwt.verify(token,'UCANTSEEME');
-    return decode.email;
+    return decode.email ;
 }
